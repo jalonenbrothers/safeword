@@ -1,0 +1,21 @@
+# SafeWord — deny web access to internals (repo root = webroot)
+# Apache 2.4+ (Hostinger default)
+
+# Block direct HTTP fetch of the internals that must live in the repo
+# because the repo root is the webroot. Public pages stay served.
+
+RewriteEngine Off
+
+<Files "config.php">
+  Require all denied
+</Files>
+
+<FilesMatch "\.(sql|md)$">
+  Require all denied
+</FilesMatch>
+
+# deny the internals directories
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(lib|src|migrations|tests)(/|$) - [F,L]
+</IfModule>
