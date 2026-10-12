@@ -40,6 +40,10 @@ button.secondary {
   border: 1px solid var(--line); width: auto;
 }
 a { color: var(--trust-blue); }
+footer {
+  max-width: 680px; margin: 32px auto 16px; padding: 0 16px;
+  font-size: 13px; opacity: 0.65;
+}
 .card {
   background: #fff; border: 1px solid var(--line);
   border-radius: 8px; padding: 16px; margin: 12px 0;
@@ -100,6 +104,13 @@ fieldset.challenge legend { font-size: 13px; text-transform: uppercase; letter-s
     page-break-after: always; break-after: page; border-radius: 0;
   }
   .wc-name, .wc-label { color: #000; }
+}
+
+:focus-visible { outline: 2px solid var(--trust-blue); outline-offset: 2px; }
+
+/* >=720px: forms cap at 480px per UX plan §5 */
+@media (min-width: 720px) {
+  .card form { max-width: 480px; }
 }
 
 [hidden] { display: none !important; }

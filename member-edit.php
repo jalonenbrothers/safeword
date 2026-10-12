@@ -104,14 +104,14 @@ $notice = flash_notice();
       <p class="help">Two minimum, three max. Answers are case-insensitive and checked
       during every drill. Both answers must match for a pass.</p>
       <?php if (isset($errors['challenges'])): ?><p class="field-error"><?= e($errors['challenges']) ?></p><?php endif; ?>
-      <?php for ($i = 0; $i < 3; $i++): $third = ($i === 2); ?>
+      <?php for ($i = 0; $i < 3; $i++): $third = ($i === 2 && $rows[2] === ''); ?>
         <fieldset class="challenge<?= $third ? ' third hidden-optional' : '' ?>">
           <legend>Question <?= $i + 1 ?><?= $third ? ' (optional)' : '' ?></legend>
           <label for="q<?= $i ?>">Question</label>
           <input id="q<?= $i ?>" type="text" name="q[<?= $i ?>]" value="<?= e($rows[$i]) ?>" placeholder="e.g. What was the name of our first dog?">
           <label for="a<?= $i ?>">Answer</label>
           <input id="a<?= $i ?>" type="text" name="a[<?= $i ?>]" value="" placeholder="e.g. Biscuit">
-          <p class="help">Answers are never shown or printed after save<?= $memberId ? '. On save, existing questions are replaced by what you type here.' : '' ?>.</p>
+          <p class="help"><?= $memberId ? 'On save, questions are replaced by what you type here — leave a pair blank to remove it. Keep at least 2.' : 'Answers are never shown or printed after save.' ?></p>
         </fieldset>
       <?php endfor; ?>
       <?php if (!$memberId || true): ?>

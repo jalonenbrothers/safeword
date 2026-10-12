@@ -53,7 +53,7 @@ $inviteUrl = base_url() . '/join.php?token=' . rawurlencode($fam['invite_token']
         <div class="card member-row">
           <div class="member-head">
             <strong><?= e($m['name']) ?></strong>
-            <span class="stat-chip<?php if ($d === null || $d > 30): ?> stale<?php endif; ?>">
+            <span class="stat-chip<?php if ($d !== null && $d > 30): ?> stale<?php endif; ?>">
               <?= $d === null ? 'No drill yet' : 'Last drill ' . (int)$d . ' day' . ((int)$d === 1 ? '' : 's') . ' ago' ?>
               <?php if ($d !== null && $d > 30): ?> &middot; run a drill<?php endif; ?>
             </span>
