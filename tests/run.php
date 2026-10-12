@@ -79,18 +79,30 @@ check(count($qs) === 2, 'picks exactly 2 questions');
 $ids = array_map(fn($q) => $q['id'], $qs);
 check(count(array_unique($ids)) === 2, 'picked questions are distinct');
 
-// 7. drill PASS with case/whitespace-insensitive answers
-$v = Drill::check($pdo, $emmaId, [
-    (int)$ids[0] => 'BISCUIT',
-    (int)$ids[1] => 'cape cod',
-]);
+// 7. drill PASS with case/whitespace-insensitive answers.
+// pickQuestions() shuffles, so map answers by each picked question's TEXT,
+// not by picked index (index-order is random → flaky if assumed).
+$answersByQuestion = [
+    'What was the name of our first dog?' => 'BISCUIT',
+    'Where did we summer?' => 'cape cod',
+];
+$answers = [];
+foreach (Drill::pickQuestions($pdo, $emmaId) as $q) {
+    if (isset($answersByQuestion[$q['question']])) {
+        $answers[(int)$q['id']] = $answersByQuestion[$q['question']];
+    }
+}
+check(count($answers) === 2, 'drill picked both known questions');
+$v = Drill::check($pdo, $emmaId, $answers);
 check($v['passed'] === true, 'drill PASS on matching answers (case-insensitive)');
 
-// 8. drill FAIL on one wrong answer
-$v2 = Drill::check($pdo, $emmaId, [
-    (int)$ids[0] => 'Biscuit',
-    (int)$ids[1] => 'wrong answer',
-]);
+// 8. drill FAIL on one wrong answer (answers keyed to question text again)
+$answers2 = $answers;
+foreach ($answers2 as $cid => $ans) {
+    $answers2[$cid] = 'wrong answer';
+    break; // only one wrong
+}
+$v2 = Drill::check($pdo, $emmaId, $answers2);
 check($v2['passed'] === false, 'drill FAIL on one wrong answer');
 
 // 9. drill FAIL when nothing answered
