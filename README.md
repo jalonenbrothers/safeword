@@ -40,6 +40,38 @@ MVP Lab team (separate from the Innovation Lab) — Sprint 2.
 3. Run migrations — see `migrations/README.md`.
 4. Point the subdomain document root at the repo root.
 
+## Deploy on Hostinger (myapp2mvp.earth-turtle.com)
+
+1. hPanel → **Subdomains → Add subdomain**: `myapp2mvp.earth-turtle.com`,
+   document root = the SafeWord repo root (repo root = web root; the
+   public pages are the top-level `.php` files).
+2. hPanel → **Databases → MySQL**: create database + user
+   (e.g. `u…_safeword`), note the credentials.
+3. Open **phpMyAdmin**, paste `migrations/001_create_tables.sql` in the
+   SQL tab, press Go (details in `migrations/README.md`).
+4. Copy `lib/config.example.php` → `lib/config.php`, fill in
+   `db_host=localhost`, the DB name/user/pass, and
+   `base_url=https://myapp2mvp.earth-turtle.com`.
+5. Deploy WITHOUT the `.git/` directory (repo root = web root):
+   `git archive master | ssh …` or upload an export — `.htaccess`
+   denies `.git` only if present, but don't ship it at all.
+6. Force HTTPS is automatic (subdomain gets free SSL); additionally set
+   `session.cookie_secure=1` in the Hostinger PHP settings (QA note:
+   session cookie is otherwise httponly+SameSite=Lax but not `secure`).
+7. Smoke-test: open `https://myapp2mvp.earth-turtle.com/` (landing 200),
+   create a family, add a member, run a drill; verify
+   `https://myapp2mvp.earth-turtle.com/README.md` returns 403.
+
+## Local dev (tested)
+
+- Container `safeword-dev`: `php:8.3-apache` with the repo mounted at
+  `/var/www/html`, port 18084; MySQL 8 in container `dev-mysql-1`
+  (host `dev-mysql-1`, db `safeword_dev`, user `safeword`).
+- `lib/config.php` is gitignored dev config (`db_port` 3306 supported).
+- Verified green: `php tests/run.php` (23/23 unit) and the HTTP e2e
+  smoke (20/20 checks incl. `.htaccess` internals denial with and
+  without mod_rewrite).
+
 ## Security notes
 
 - Safe words and challenge answers are stored via `password_hash()`
