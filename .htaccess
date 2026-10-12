@@ -3,8 +3,11 @@
 
 # Block direct HTTP fetch of the internals that must live in the repo
 # because the repo root is the webroot. Public pages stay served.
-
-RewriteEngine Off
+# NOTE: the rewrite rules sit inside <IfModule> so a host without
+# mod_rewrite still serves pages (a bare RewriteEngine would 500 every
+# request on such hosts). On those hosts the directories below are not
+# rewrite-blocked — but Hostinger ships mod_rewrite, and config.php
+# plus *.sql/*.md are still Files/FilesMatch-denied unconditionally.
 
 <Files "config.php">
   Require all denied
@@ -14,8 +17,12 @@ RewriteEngine Off
   Require all denied
 </FilesMatch>
 
-# deny the internals directories
+# deny the internals directories — mod_rewrite when available…
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^(lib|src|migrations|tests)(/|$) - [F,L]
+</IfModule>
+# …and a RedirectMatch 403 fallback for hosts without mod_rewrite
+<IfModule !mod_rewrite.c>
+  RedirectMatch 403 ^/(lib|src|migrations|tests)(/|$)
 </IfModule>
